@@ -1,4 +1,5 @@
 import 'package:firebase_project/ui_design/log_in_page.dart';
+import 'package:firebase_project/ui_design/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
           // tested with just a hot reload.
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         ),
-        home: const LogInPage(),
+        home: const RegisterPage(),
       ),
     );
   }

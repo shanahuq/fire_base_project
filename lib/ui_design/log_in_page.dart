@@ -1,3 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_project/ui_design/home_page.dart';
+import 'package:firebase_project/ui_design/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -10,6 +13,35 @@ class LogInPage extends StatefulWidget {
 
 class _LogInPageState extends State<LogInPage> {
   bool isChecked = true;
+  bool isVisible = false;
+  TextEditingController email_controller = TextEditingController();
+  TextEditingController password_controller = TextEditingController();
+
+  Future<void> signIn(String email, String password) async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password.trim(),
+      );
+
+      print("Login Success");
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print("No user found");
+      } else if (e.code == 'wrong-password') {
+        print("Wrong password");
+      } else {
+        print(e.message);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,6 +97,7 @@ class _LogInPageState extends State<LogInPage> {
 
                 TextField(
                   keyboardType: TextInputType.emailAddress,
+                  controller: email_controller,
                   decoration: InputDecoration(
                     labelText: 'Email',
                     hintText: 'Enter Your Email',
@@ -91,7 +124,9 @@ class _LogInPageState extends State<LogInPage> {
                 ),
                 SizedBox(height: 10.h),
                 TextField(
+                  obscureText: isVisible,
                   keyboardType: TextInputType.visiblePassword,
+                  controller: password_controller,
                   decoration: InputDecoration(
                     labelText: 'Password',
                     hintText: 'Enter Your Password',
@@ -99,10 +134,20 @@ class _LogInPageState extends State<LogInPage> {
                       Icons.lock_outline,
                       color: Colors.grey,
                     ),
-                    suffix: const Icon(
-                      Icons.visibility_outlined,
-                      color: Colors.grey,
+                    suffix: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isVisible = !isVisible;
+                        });
+                      },
+                      icon: Icon(
+                        isVisible
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: Colors.grey,
+                      ),
                     ),
+
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.r),
                     ),
@@ -142,7 +187,9 @@ class _LogInPageState extends State<LogInPage> {
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    signIn(email_controller.text, password_controller.text);
+                  },
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 100.w),
                     child: Text(
@@ -214,11 +261,21 @@ class _LogInPageState extends State<LogInPage> {
                     ),
                     TextButton(
                       onPressed: () {},
-                      child: Text(
-                        'Register',
-                        style: TextStyle(
-                          color: Colors.blueAccent,
-                          fontSize: 12.sp,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RegisterPage(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'Register',
+                          style: TextStyle(
+                            color: Colors.blueAccent,
+                            fontSize: 12.sp,
+                          ),
                         ),
                       ),
                     ),
